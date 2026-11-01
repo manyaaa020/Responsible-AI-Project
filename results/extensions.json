@@ -1,0 +1,351 @@
+{
+  "bootstrap": {
+    "baseline": {
+      "muslim": {
+        "fpr": 0.20833333333333334,
+        "lo": 0.10521778584392014,
+        "hi": 0.34092294900221726,
+        "n_harmless": 48
+      },
+      "jewish": {
+        "fpr": 0.6521739130434783,
+        "lo": 0.4583333333333333,
+        "hi": 0.85,
+        "n_harmless": 23
+      },
+      "black": {
+        "fpr": 0.3269230769230769,
+        "lo": 0.19641981792717086,
+        "hi": 0.45652173913043476,
+        "n_harmless": 52
+      },
+      "white": {
+        "fpr": 0.1744186046511628,
+        "lo": 0.11840170278637771,
+        "hi": 0.2307795698924731,
+        "n_harmless": 172
+      },
+      "lgbtq": {
+        "fpr": 0.15151515151515152,
+        "lo": 0.06247596153846154,
+        "hi": 0.24490758567577972,
+        "n_harmless": 66
+      },
+      "women": {
+        "fpr": 0.09782608695652174,
+        "lo": 0.041666666666666664,
+        "hi": 0.15959454034524287,
+        "n_harmless": 92
+      },
+      "migrant": {
+        "fpr": 0.18181818181818182,
+        "lo": 0.09996478873239438,
+        "hi": 0.27781862745098035,
+        "n_harmless": 77
+      },
+      "asian_hispanic": {
+        "fpr": 0.18181818181818182,
+        "lo": 0.03362068965517246,
+        "hi": 0.36363636363636365,
+        "n_harmless": 22
+      },
+      "background": {
+        "fpr": 0.31092436974789917,
+        "lo": 0.26610582829623075,
+        "hi": 0.3601300718084903,
+        "n_harmless": 357
+      }
+    },
+    "final": {
+      "muslim": {
+        "fpr": 0.25,
+        "lo": 0.130414653784219,
+        "hi": 0.391304347826087,
+        "n_harmless": 48
+      },
+      "jewish": {
+        "fpr": 0.4782608695652174,
+        "lo": 0.2855714285714286,
+        "hi": 0.7,
+        "n_harmless": 23
+      },
+      "black": {
+        "fpr": 0.3269230769230769,
+        "lo": 0.19607843137254902,
+        "hi": 0.4523921832884097,
+        "n_harmless": 52
+      },
+      "white": {
+        "fpr": 0.1744186046511628,
+        "lo": 0.1193153597230584,
+        "hi": 0.23529411764705882,
+        "n_harmless": 172
+      },
+      "lgbtq": {
+        "fpr": 0.16666666666666666,
+        "lo": 0.07692307692307693,
+        "hi": 0.26317616959064327,
+        "n_harmless": 66
+      },
+      "women": {
+        "fpr": 0.09782608695652174,
+        "lo": 0.041666666666666664,
+        "hi": 0.15959454034524287,
+        "n_harmless": 92
+      },
+      "migrant": {
+        "fpr": 0.16883116883116883,
+        "lo": 0.08823529411764706,
+        "hi": 0.26666666666666666,
+        "n_harmless": 77
+      },
+      "asian_hispanic": {
+        "fpr": 0.22727272727272727,
+        "lo": 0.0625,
+        "hi": 0.4117647058823529,
+        "n_harmless": 22
+      },
+      "background": {
+        "fpr": 0.3165266106442577,
+        "lo": 0.27002824304550765,
+        "hi": 0.36667630057803463,
+        "n_harmless": 357
+      }
+    },
+    "improvement": {
+      "muslim": {
+        "diff": -0.04166666666666666,
+        "lo": -0.10419407894736844,
+        "hi": 0.0,
+        "significant": false
+      },
+      "jewish": {
+        "diff": 0.17391304347826086,
+        "lo": 0.040000000000000036,
+        "hi": 0.34788043478260866,
+        "significant": true
+      },
+      "black": {
+        "diff": 0.0,
+        "lo": -0.05263157894736842,
+        "hi": 0.05454545454545451,
+        "significant": false
+      },
+      "white": {
+        "diff": 0.0,
+        "lo": -0.02222846441947566,
+        "hi": 0.024543664318715436,
+        "significant": false
+      },
+      "lgbtq": {
+        "diff": -0.015151515151515138,
+        "lo": -0.05557511737089204,
+        "hi": 0.0,
+        "significant": false
+      },
+      "women": {
+        "diff": 0.0,
+        "lo": 0.0,
+        "hi": 0.0,
+        "significant": false
+      },
+      "migrant": {
+        "diff": 0.012987012987012991,
+        "lo": 0.0,
+        "hi": 0.04411764705882351,
+        "significant": false
+      },
+      "asian_hispanic": {
+        "diff": -0.04545454545454544,
+        "lo": -0.15794736842105261,
+        "hi": 0.0,
+        "significant": false
+      },
+      "background": {
+        "diff": -0.0056022408963585235,
+        "lo": -0.02579168146123548,
+        "hi": 0.017200774141657882,
+        "significant": false
+      }
+    }
+  },
+  "inprocessing": [
+    {
+      "model": "Baseline",
+      "AUC": 0.8454790581427118,
+      "F1": 0.8067826863007586,
+      "Final bias score": 0.7927820804981458,
+      "Mean BPSN AUC": 0.79474634321246,
+      "Max FPR gap": 0.3412495432955791,
+      "Jewish FPR": 0.6521739130434783,
+      "Jewish FNR": 0.07608695652173914,
+      "Counterfactual gap": 0.10696759728628001,
+      "group_fpr": {
+        "muslim": 0.20833333333333334,
+        "jewish": 0.6521739130434783,
+        "black": 0.3269230769230769,
+        "white": 0.1744186046511628,
+        "lgbtq": 0.15151515151515152,
+        "women": 0.09782608695652174,
+        "migrant": 0.18181818181818182,
+        "asian_hispanic": 0.18181818181818182
+      }
+    },
+    {
+      "model": "Final model (post-processing)",
+      "AUC": 0.8415285249103068,
+      "F1": 0.796221322537112,
+      "Final bias score": 0.8013415546975775,
+      "Mean BPSN AUC": 0.8479589542666343,
+      "Max FPR gap": 0.21870052368773596,
+      "Jewish FPR": 0.4782608695652174,
+      "Jewish FNR": 0.2934782608695652,
+      "Counterfactual gap": 0.10902841366921844,
+      "group_fpr": {
+        "muslim": 0.25,
+        "jewish": 0.4782608695652174,
+        "black": 0.3269230769230769,
+        "white": 0.1744186046511628,
+        "lgbtq": 0.16666666666666666,
+        "women": 0.09782608695652174,
+        "migrant": 0.16883116883116883,
+        "asian_hispanic": 0.22727272727272727
+      }
+    },
+    {
+      "model": "In-processing: FPR parity",
+      "AUC": 0.8457578797909173,
+      "F1": 0.8067826863007586,
+      "Final bias score": 0.7999140307857319,
+      "Mean BPSN AUC": 0.8150295900443524,
+      "Max FPR gap": 0.30337352332237244,
+      "Jewish FPR": 0.6086956521739131,
+      "Jewish FNR": 0.11956521739130432,
+      "Counterfactual gap": 0.09829122425246793,
+      "group_fpr": {
+        "muslim": 0.20833333333333334,
+        "jewish": 0.6086956521739131,
+        "black": 0.3269230769230769,
+        "white": 0.18604651162790697,
+        "lgbtq": 0.16666666666666666,
+        "women": 0.09782608695652174,
+        "migrant": 0.19480519480519481,
+        "asian_hispanic": 0.18181818181818182
+      }
+    },
+    {
+      "model": "In-processing: Equalized odds",
+      "AUC": 0.8463345591034708,
+      "F1": 0.8074534161490683,
+      "Final bias score": 0.8023697540745225,
+      "Mean BPSN AUC": 0.8189331614811424,
+      "Max FPR gap": 0.3005724028741932,
+      "Jewish FPR": 0.6086956521739131,
+      "Jewish FNR": 0.11956521739130432,
+      "Counterfactual gap": 0.09555973227851716,
+      "group_fpr": {
+        "muslim": 0.20833333333333334,
+        "jewish": 0.6086956521739131,
+        "black": 0.34615384615384615,
+        "white": 0.19767441860465115,
+        "lgbtq": 0.18181818181818182,
+        "women": 0.10869565217391304,
+        "migrant": 0.22077922077922077,
+        "asian_hispanic": 0.18181818181818182
+      }
+    }
+  ],
+  "metricframe": {
+    "rows": [
+      {
+        "group": "muslim",
+        "ours": 0.25,
+        "fairlearn": 0.25,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "jewish",
+        "ours": 0.4782608695652174,
+        "fairlearn": 0.4782608695652174,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "black",
+        "ours": 0.3269230769230769,
+        "fairlearn": 0.3269230769230769,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "white",
+        "ours": 0.1744186046511628,
+        "fairlearn": 0.1744186046511628,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "lgbtq",
+        "ours": 0.16666666666666666,
+        "fairlearn": 0.16666666666666666,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "women",
+        "ours": 0.09782608695652174,
+        "fairlearn": 0.09782608695652174,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "migrant",
+        "ours": 0.16883116883116883,
+        "fairlearn": 0.16883116883116883,
+        "abs_diff": 0.0
+      },
+      {
+        "group": "asian_hispanic",
+        "ours": 0.22727272727272727,
+        "fairlearn": 0.22727272727272727,
+        "abs_diff": 0.0
+      }
+    ],
+    "max_abs_diff": 0.0
+  },
+  "annotators": {
+    "baseline": {
+      "share_split_all": 0.28326403326403327,
+      "error_rate_unanimous": 0.17621464829586658,
+      "error_rate_split": 0.3486238532110092,
+      "fpr_unanimous_harmless": 0.20436507936507936,
+      "fpr_split_harmless": 0.33093525179856115,
+      "split_share_harmless": 0.3554987212276215,
+      "split_share_false_positives": 0.4717948717948718,
+      "split_share_identity_false_positives": 0.4166666666666667,
+      "jewish_harmless_n": 23,
+      "jewish_harmless_split_share": 0.4782608695652174,
+      "background_harmless_split_share": 0.4005602240896359,
+      "vote_distribution_test": {
+        "0": 504,
+        "1": 278,
+        "2": 267,
+        "3": 875
+      }
+    },
+    "final": {
+      "share_split_all": 0.28326403326403327,
+      "error_rate_unanimous": 0.18129079042784627,
+      "error_rate_split": 0.3724770642201835,
+      "fpr_unanimous_harmless": 0.20238095238095238,
+      "fpr_split_harmless": 0.3381294964028777,
+      "split_share_harmless": 0.3554987212276215,
+      "split_share_false_positives": 0.47959183673469385,
+      "split_share_identity_false_positives": 0.42168674698795183,
+      "jewish_harmless_n": 23,
+      "jewish_harmless_split_share": 0.4782608695652174,
+      "background_harmless_split_share": 0.4005602240896359,
+      "vote_distribution_test": {
+        "0": 504,
+        "1": 278,
+        "2": 267,
+        "3": 875
+      }
+    }
+  }
+}

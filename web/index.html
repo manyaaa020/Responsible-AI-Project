@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moderation desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef1ef; --sheet:#ffffff; --ink:#1d2a33; --muted:#5d6970; --faint:#8b969b;
+  --rule:#d3dad7; --allow:#2f6f73; --review:#a3701a; --remove:#9b3a33;
+  --allow-bg:#e3eeee; --review-bg:#f5ecdb; --remove-bg:#f4e3e1;
+  --ui:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --read:"Source Serif 4", Georgia, "Times New Roman", serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5}
+.wrap{max-width:880px;margin:0 auto;padding:40px 24px 80px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.brand h1{font-family:var(--read);font-weight:700;font-size:2rem;letter-spacing:-.01em;margin:0}
+.brand p{margin:4px 0 0;color:var(--muted);max-width:52ch}
+nav{display:flex;gap:22px}
+nav button{all:unset;cursor:pointer;color:var(--muted);padding:4px 0;border-bottom:2px solid transparent}
+nav button[aria-selected="true"]{color:var(--ink);border-color:var(--ink)}
+nav button:focus-visible,button:focus-visible,textarea:focus-visible,.idw:focus-visible,.chip:focus-visible,.seg button:focus-visible,.atk:focus-within{outline:2px solid var(--allow);outline-offset:3px}
+section[hidden]{display:none}
+
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:22px 24px;box-shadow:0 1px 0 #dfe5e2, 0 12px 28px -18px rgba(29,42,51,.25)}
+.label{font-size:.9rem;color:var(--muted);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.chip{all:unset;cursor:pointer;font-size:.9rem;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink)}
+.chip:hover{border-color:var(--faint)}
+textarea{width:100%;min-height:92px;resize:vertical;border:none;border-bottom:1px solid var(--rule);padding:4px 0 10px;font-family:var(--read);font-size:1.25rem;line-height:1.5;color:var(--ink);background:transparent}
+textarea:focus{outline:none;border-color:var(--ink)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;font-size:.9rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.hint{font-size:.85rem;color:var(--faint)}
+
+/* result */
+.result{margin-top:26px;display:grid;grid-template-columns:1fr 190px;gap:28px;align-items:start}
+@media (max-width:700px){.result{grid-template-columns:1fr}}
+.post{font-family:var(--read);font-size:1.3rem;line-height:2.05;word-wrap:break-word}
+.w{padding:0 1px;border-radius:2px;transition:background .25s}
+.idw{cursor:pointer;border-bottom:2px dotted var(--ink)}
+.idw.active{background:var(--ink)!important;color:#fff}
+.legend{font-size:.85rem;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:22px;height:9px;vertical-align:middle;margin:0 4px 0 10px;border-radius:2px}
+.legend i:first-child{margin-left:0}
+
+.stamp{justify-self:center;margin-top:6px;transform:rotate(-5deg);border:3px double currentColor;border-radius:6px;padding:10px 14px;text-align:center;font-family:var(--read);font-weight:700;font-size:1.35rem;line-height:1.15;min-width:160px}
+.stamp small{display:block;font-family:var(--ui);font-weight:400;font-size:.78rem;margin-top:4px;opacity:.85}
+.stamp.allow{color:var(--allow)} .stamp.review{color:var(--review)} .stamp.remove{color:var(--remove)}
+.stamp.press{animation:press .42s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes press{0%{transform:rotate(-9deg) scale(1.35);opacity:0}60%{opacity:1}100%{transform:rotate(-5deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.stamp.press,.flick{animation:none!important}.marker{transition:none!important}}
+
+/* track */
+.track{position:relative;margin:34px 0 8px;height:10px;border-radius:5px;display:flex;overflow:visible}
+.zone{height:100%}
+.zone.a{background:var(--allow);opacity:.35;border-radius:5px 0 0 5px}
+.zone.r{background:var(--review);opacity:.35}
+.zone.x{background:var(--remove);opacity:.35;border-radius:0 5px 5px 0}
+.marker{position:absolute;top:-8px;width:2px;height:26px;background:var(--ink);transition:left .45s cubic-bezier(.3,.7,.2,1)}
+.marker span{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:.85rem;font-weight:700;white-space:nowrap}
+.marker.ghost{background:var(--faint)}
+.marker.ghost span{color:var(--faint);bottom:auto;top:28px;font-weight:400}
+.zlabels{display:flex;font-size:.82rem;color:var(--muted)}
+.zlabels div{padding-top:2px}
+
+.notice{margin-top:22px;border-left:3px solid var(--ink);padding:10px 16px;background:#f7f8f7}
+.notice h3{font-size:.95rem;margin:0 0 4px}
+.notice p{margin:0;color:var(--ink)}
+.readas{margin-top:14px;font-size:.95rem;color:var(--muted)}
+.readas q{font-family:var(--read);color:var(--ink);quotes:none}
+details{margin-top:16px;font-size:.9rem;color:var(--muted)}
+summary{cursor:pointer}
+
+/* counterfactual */
+.cf{margin-top:26px;border-top:1px solid var(--rule);padding-top:20px}
+.cf h3{font-family:var(--read);font-size:1.2rem;margin:0 0 4px}
+.cf p{margin:0 0 14px;color:var(--muted)}
+.bars{display:grid;grid-template-columns:150px 1fr 48px;gap:6px 12px;align-items:center;font-size:.92rem}
+.bars .bar{height:12px;border-radius:2px;background:var(--rule);position:relative;overflow:hidden}
+.bars .bar b{position:absolute;inset:0 auto 0 0;border-radius:2px;transition:width .4s}
+.bars .me{font-weight:700}
+.bars .num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* attacks */
+.atks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:14px 0 4px}
+.atk{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:4px;padding:10px 12px;cursor:pointer;background:var(--sheet)}
+.atk:has(input:checked){border-color:var(--ink);box-shadow:inset 3px 0 0 var(--ink)}
+.atk input{margin-top:4px;accent-color:var(--ink)}
+.atk b{display:block;font-size:.95rem}
+.atk span{font-size:.85rem;color:var(--muted)}
+.btn{all:unset;cursor:pointer;background:var(--ink);color:#fff;padding:9px 18px;border-radius:4px;font-weight:700}
+.btn:disabled{opacity:.5;cursor:default}
+.compare{margin-top:24px}
+.line{font-family:var(--read);font-size:1.25rem;line-height:1.9;margin:4px 0 14px}
+.line mark{background:var(--review-bg);color:var(--ink);border-bottom:2px solid var(--review);padding:0 2px}
+.flick{animation:flick .5s steps(4) both}
+@keyframes flick{0%{opacity:0}40%{opacity:1}60%{opacity:.2}100%{opacity:1}}
+.outcome{font-family:var(--read);font-size:1.45rem;font-weight:600;margin:24px 0 6px}
+.outcome.held{color:var(--allow)} .outcome.broke{color:var(--remove)}
+.flags{font-size:.9rem;color:var(--muted)}
+
+/* audit */
+.audit h2{font-family:var(--read);font-size:1.45rem;margin:40px 0 6px}
+.audit h2:first-child{margin-top:0}
+.audit .lede{color:var(--muted);margin:0 0 16px;max-width:65ch}
+.fpr{display:grid;grid-template-columns:120px 1fr 50px;gap:8px 12px;align-items:center;font-size:.92rem;margin-top:16px}
+.fpr .bar{height:14px;background:transparent;position:relative}
+.fpr .bar b{position:absolute;left:0;top:0;bottom:0;background:var(--allow);border-radius:2px;transition:width .5s}
+.fpr .bar b.hot{background:var(--remove)}
+.fpr .bg{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed var(--faint)}
+.grid{width:100%;border-collapse:collapse;font-size:.9rem}
+.grid th{font-weight:400;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule)}
+.grid td{padding:8px;text-align:center;font-variant-numeric:tabular-nums;border-bottom:1px solid #edf0ee}
+.grid td:first-child{text-align:left}
+.trio{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:700px){.trio{grid-template-columns:1fr}}
+.trio h3{font-size:1rem;margin:0 0 10px}
+.mini{display:flex;align-items:flex-end;gap:14px;height:140px;border-bottom:1px solid var(--rule)}
+.mini div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.85rem}
+.mini b{width:100%;border-radius:2px 2px 0 0;transition:height .6s}
+.mini em{font-style:normal;font-weight:700;margin-bottom:4px}
+.minil{display:flex;gap:14px;font-size:.82rem;color:var(--muted)}
+.minil div{flex:1;text-align:center}
+.stack{display:flex;height:34px;border-radius:3px;overflow:hidden;margin:10px 0 6px}
+.stack div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:700}
+.ci{display:grid;grid-template-columns:150px 1fr 120px;gap:10px 12px;align-items:center;font-size:.92rem;margin-top:16px}
+.ci .track2{position:relative;height:18px}
+.ci .whisk{position:absolute;top:8px;height:2px;background:var(--allow)}
+.ci .whisk.b{background:#b9bfc3;top:3px}
+.ci .dot{position:absolute;width:10px;height:10px;border-radius:50%;margin-left:-5px;top:4px;background:var(--allow)}
+.ci .dot.b{background:#9aa0a6;width:8px;height:8px;margin-left:-4px;top:0}
+.ci .bgl{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed var(--faint)}
+.ci .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.ci .sig{color:var(--allow);font-weight:700}
+.pair{display:flex;gap:28px;flex-wrap:wrap;margin-top:8px}
+.pair div{flex:1;min-width:200px;border-left:3px solid var(--rule);padding:4px 14px}
+.pair b{display:block;font-family:var(--read);font-size:1.9rem;font-weight:600}
+.pair span{color:var(--muted);font-size:.9rem}
+.err{color:var(--remove);font-size:.95rem}
+footer{margin-top:48px;font-size:.85rem;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Moderation desk</h1>
+      <p>A toxicity screen that shows its reasoning, treats groups alike, and resists people trying to sneak past it.</p>
+    </div>
+    <nav role="tablist">
+      <button role="tab" aria-selected="true" data-tab="check">Check a post</button>
+      <button role="tab" aria-selected="false" data-tab="evade">Try to evade it</button>
+      <button role="tab" aria-selected="false" data-tab="audit">What the audit found</button>
+    </nav>
+  </header>
+
+  <!-- CHECK -->
+  <section id="check">
+    <div class="sheet">
+      <p class="label">Start from an example, or write your own. The verdict updates as you type.</p>
+      <div class="chips" id="examples"></div>
+      <textarea id="post" aria-label="Post to check" placeholder="Type or paste a post"></textarea>
+      <div class="row">
+        <div class="seg" role="group" aria-label="Explanation method">
+          <button aria-pressed="true" data-m="occlusion">Occlusion</button>
+          <button aria-pressed="false" data-m="lime">LIME</button>
+        </div>
+        <span class="hint" id="status">&nbsp;</span>
+      </div>
+
+      <div id="out" hidden>
+        <div class="result">
+          <div>
+            <div class="post" id="render"></div>
+            <div class="legend"><i style="background:rgba(155,58,51,.45)"></i>pushed towards removal<i style="background:rgba(47,111,115,.4)"></i>pulled away from it<span id="idhint"></span></div>
+          </div>
+          <div class="stamp" id="stamp"></div>
+        </div>
+        <div class="track" id="track"></div>
+        <div class="zlabels" id="zlabels"></div>
+        <div id="notice"></div>
+        <div id="readas"></div>
+        <details><summary>Scores and thresholds</summary><div id="detail" style="margin-top:8px"></div></details>
+        <div id="cf"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVADE -->
+  <section id="evade" hidden>
+    <div class="sheet">
+      <p class="label">A toxic post to disguise</p>
+      <textarea id="atext" aria-label="Toxic post">you are a pathetic idiot and everyone here hates you</textarea>
+      <p class="label" style="margin-top:18px">How the attacker disguises it. They only see the score, like someone probing a public moderation API.</p>
+      <div class="atks" id="atks"></div>
+      <div class="row"><button class="btn" id="run">Run the attack</button><span class="hint" id="astatus"></span></div>
+      <div id="aout"></div>
+    </div>
+  </section>
+
+  <!-- AUDIT -->
+  <section id="audit" hidden>
+    <div class="sheet audit" id="auditbody"><p class="hint">Loading results…</p></div>
+  </section>
+
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct = x => Math.round(x * 100) + '%';
+const ACTION = {
+  'allow': {cls:'allow', stamp:'Allowed', sub:'stays up'},
+  'human review': {cls:'review', stamp:'Needs a person', sub:'sent to a moderator'},
+  'remove': {cls:'remove', stamp:'Removed', sub:'author can appeal'}
+};
+const GL = {muslim:'Muslim',jewish:'Jewish',black:'Black',white:'White',lgbtq:'LGBTQ+',women:'Women',migrant:'Migrant',asian_hispanic:'Asian / Hispanic'};
+async function api(path, body){
+  const r = await fetch(path, {method: body ? 'POST' : 'GET', headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined});
+  const j = await r.json();
+  if (j.error) throw new Error(j.error);
+  return j;
+}
+
+/* tabs */
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+  ['check','evade','audit'].forEach(id => $('#'+id).hidden = id !== b.dataset.tab);
+  if (b.dataset.tab === 'audit') loadAudit();
+});
+
+/* ---------- check a post ---------- */
+const EXAMPLES = [
+  ['Neutral mention', 'my neighbour is jewish and she runs the local food bank'],
+  ['Supportive', 'so proud of my gay brother for coming out , love you'],
+  ['Insult', 'you are a pathetic idiot and everyone here hates you'],
+  ['Disguised insult', 'you are a p4th3tic 1d10t and everyone here hates you'],
+  ['Aimed at a group', 'immigrants should go back where they came from , nobody wants them here'],
+];
+EXAMPLES.forEach(([k, v]) => {
+  const c = document.createElement('button'); c.className = 'chip'; c.textContent = k;
+  c.onclick = () => { $('#post').value = v; check(); }; $('#examples').appendChild(c);
+});
+let method = 'occlusion', timer = null, lastAction = null, lastText = '', cfIndex = null;
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  method = b.dataset.m; check();
+});
+$('#post').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(check, 380); });
+
+function heat(a, peak){
+  const t = Math.min(1, Math.abs(a) / peak) * .5;
+  if (t < .04) return '';
+  const col = a > 0 ? `rgba(155,58,51,${t.toFixed(2)})` : `rgba(47,111,115,${(t*.85).toFixed(2)})`;
+  return `background:linear-gradient(transparent 38%, ${col} 38%)`;
+}
+function track(el, labels, score, ghost, th){
+  const r = th.review, x = th.remove;
+  el.innerHTML = `<div class="zone a" style="width:${r*100}%"></div><div class="zone r" style="width:${(x-r)*100}%"></div><div class="zone x" style="width:${(1-x)*100}%"></div>`
+    + (ghost != null ? `<div class="marker ghost" style="left:${ghost*100}%"><span>before ${ghost.toFixed(2)}</span></div>` : '')
+    + `<div class="marker" style="left:0%"><span>${score.toFixed(2)}</span></div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.querySelector('.marker:not(.ghost)').style.left = (score*100) + '%'));
+  labels.innerHTML = `<div style="width:${r*100}%">Allow</div><div style="width:${(x-r)*100}%">Human review</div><div style="width:${(1-x)*100}%;text-align:right">Remove</div>`;
+}
+
+async function check(){
+  const text = $('#post').value;
+  if (!text.trim()){ $('#out').hidden = true; $('#status').textContent = ' '; return; }
+  $('#status').textContent = method === 'lime' ? 'Running LIME…' : 'Checking…';
+  try{
+    const d = await api('/api/moderate', {text, method});
+    if (d.empty) return;
+    if (text !== lastText) cfIndex = null;
+    lastText = text;
+    render(d);
+    $('#status').textContent = ' ';
+  }catch(e){ $('#status').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+}
+
+function render(d){
+  $('#out').hidden = false;
+  const peak = Math.max(1e-6, ...d.words.map(w => Math.abs(w.a)));
+  $('#render').innerHTML = d.words.map((w, i) => w.group
+    ? `<span class="w idw${i===cfIndex?' active':''}" tabindex="0" role="button" data-i="${i}" title="See how the score changes if a different group is named" style="${heat(w.a, peak)}">${esc(w.w)}</span>`
+    : `<span class="w" style="${heat(w.a, peak)}">${esc(w.w)}</span>`).join(' ');
+  $('#idhint').textContent = d.words.some(w => w.group) ? '. Dotted words name a group: click one.' : '';
+  document.querySelectorAll('.idw').forEach(s => {
+    const go = () => counterfactual(+s.dataset.i);
+    s.onclick = go; s.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
+  });
+
+  const A = ACTION[d.action], st = $('#stamp');
+  st.className = 'stamp ' + A.cls;
+  st.innerHTML = `${A.stamp}<small>${A.sub}</small>`;
+  if (d.action !== lastAction){ void st.offsetWidth; st.classList.add('press'); lastAction = d.action; }
+
+  track($('#track'), $('#zlabels'), d.score, null, d.thresholds);
+
+  $('#notice').innerHTML = d.action === 'allow' ? '' :
+    `<div class="notice"><h3>What the author would see</h3><p>${esc(d.explanation)} ${esc(d.notes.join(' '))}</p></div>`;
+  $('#readas').innerHTML = d.changed_by_normalization
+    ? `<p class="readas">After cleaning up disguised spelling, the model read: <q>${esc(d.normalized)}</q></p>` : '';
+  const gt = Object.entries(d.group_thresholds).map(([g, t]) => `${GL[g]} ${t.toFixed(2)}`).join(', ');
+  $('#detail').innerHTML = `Model score ${d.raw.toFixed(3)}, after calibration and group adjustment ${d.score.toFixed(3)}.
+    Human review from ${d.thresholds.review}, removal from ${d.thresholds.remove}.
+    ${gt ? `Group thresholds for this post: ${gt}. A value above 0.50 means the model over-flagged that group in testing, so it must be more certain before acting.` : ''}`;
+  if (cfIndex != null) counterfactual(cfIndex, true);
+  else $('#cf').innerHTML = '';
+}
+
+async function counterfactual(i, quiet){
+  cfIndex = i;
+  document.querySelectorAll('.idw').forEach(s => s.classList.toggle('active', +s.dataset.i === i));
+  try{
+    const c = await api('/api/counterfactual', {text: $('#post').value, index: i});
+    const col = a => a === 'remove' ? 'var(--remove)' : a === 'human review' ? 'var(--review)' : 'var(--allow)';
+    const rows = c.variants.map(v => {
+      const me = v.group === c.original_group;
+      return `<div class="${me?'me':''}">${esc(v.label)}${me?' (as written)':''}</div>
+        <div class="bar"><b style="width:0%;background:${col(v.action)}" data-w="${v.score*100}"></b></div>
+        <div class="num ${me?'me':''}">${v.score.toFixed(2)}</div>`;
+    }).join('');
+    const verdict = c.spread < .1
+      ? `Swapping only this word moves the score by at most ${c.spread.toFixed(2)}, so the model is judging what is said, not who is named.`
+      : `Swapping only this word moves the score by up to ${c.spread.toFixed(2)}. The group named still affects the decision, which is the bias the audit measures.`;
+    $('#cf').innerHTML = `<div class="cf"><h3>What if this post named a different group?</h3>
+      <p>Every other word stays the same as "${esc(c.original)}" is replaced. ${verdict}</p><div class="bars">${rows}</div></div>`;
+    requestAnimationFrame(() => document.querySelectorAll('#cf .bar b').forEach(b => b.style.width = b.dataset.w + '%'));
+    if (!quiet) $('#cf').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }catch(e){ $('#cf').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+
+/* ---------- evade ---------- */
+const ATTACKS = [
+  ['leetspeak','Leetspeak','Swap letters for numbers: idiot becomes 1d10t.'],
+  ['homoglyph','Look-alike letters','Replace Latin letters with identical-looking Cyrillic ones.'],
+  ['zero_width','Invisible characters','Hide zero-width characters inside the key words.'],
+  ['spacing','Spaced-out letters','Write the key words as i d i o t.'],
+  ['benign_pad','Friendly padding','Tack on warm words to dilute the score.'],
+  ['greedy_2','Adaptive, 2 words','Try edits on the two most important words, keep whatever lowers the score most.'],
+  ['greedy','Adaptive, up to 30%','The same search with a bigger budget. The hardest attack to stop.'],
+];
+$('#atks').innerHTML = ATTACKS.map(([k, t, d], i) =>
+  `<label class="atk"><input type="radio" name="atk" value="${k}" ${i===0?'checked':''}><div><b>${t}</b><span>${d}</span></div></label>`).join('');
+
+$('#run').onclick = async () => {
+  const text = $('#atext').value, attack = document.querySelector('input[name=atk]:checked').value;
+  if (!text.trim()) return;
+  $('#run').disabled = true; $('#astatus').textContent = 'Attacking…';
+  try{
+    const r = await api('/api/attack', {text, attack});
+    const same = r.before.action === r.after.action;
+    const held = r.after.action !== 'allow';
+    const outcome = r.before.action === 'allow'
+      ? ['held', 'This post was already allowed before the attack. Try a more clearly toxic post.']
+      : held ? ['held', same ? 'The defences held. The disguised post gets the same verdict.' : `Partly held. The score dropped, but the post still goes to ${r.after.action === 'remove' ? 'removal' : 'a person'} rather than slipping through.`]
+             : ['broke', 'The attack got through. The disguised post would be allowed.'];
+    const flags = [];
+    if (r.has_invisible) flags.push('contains invisible characters you cannot see above');
+    if (r.has_lookalikes) flags.push('contains letters from another alphabet that look identical');
+    $('#aout').innerHTML = `<div class="compare">
+      <p class="label" style="margin-top:22px">Original</p><div class="line">${esc(r.original)}</div>
+      <p class="label">What gets posted${flags.length ? ` (${flags.join('; ')})` : ''}</p>
+      <div class="line">${r.segments.map((sg, i) => sg.changed
+          ? `<mark class="flick" style="animation-delay:${i*60}ms">${esc(sg.text)}</mark>` : esc(sg.text)).join(' ')}</div>
+      <div class="outcome ${outcome[0]}">${outcome[1]}</div>
+      <div class="track" id="atrack"></div><div class="zlabels" id="azl"></div>
+      <p class="readas">What the model read after cleaning: <q>${esc(r.after.normalized)}</q></p></div>`;
+    track($('#atrack'), $('#azl'), r.after.score, r.before.score, r.after.thresholds);
+    $('#astatus').textContent = '';
+  }catch(e){ $('#astatus').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  $('#run').disabled = false;
+};
+
+/* ---------- audit ---------- */
+let M = null, view = 'baseline';
+async function loadAudit(){
+  if (M) return;
+  try{ M = await api('/api/metrics'); drawAudit(); drawExtensions(); }
+  catch(e){ $('#auditbody').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+async function drawExtensions(){
+  let E;
+  try{ E = await api('/api/extensions'); }catch(e){ return; }
+  if (E.missing) { $('#auditbody').insertAdjacentHTML('beforeend', '<p class="hint" style="margin-top:32px">Run <b>python run_extensions.py</b> to add confidence intervals, in-processing and annotator results here.</p>'); return; }
+  const bs = E.bootstrap, imp = bs.improvement, max = .9, X = v => (v/max*100).toFixed(1) + '%';
+  const groups = Object.keys(GL).filter(g => bs.final[g]);
+  const bgf = bs.final.background;
+  const rows = groups.map(g => {
+    const b = bs.baseline[g], f = bs.final[g], d = imp[g];
+    return `<div>${GL[g]} <span class="hint">n=${f.n_harmless}</span></div>
+      <div class="track2"><span class="bgl" style="left:${X(bgf.fpr)}"></span>
+        <span class="whisk b" style="left:${X(b.lo)};width:calc(${X(b.hi)} - ${X(b.lo)})"></span><span class="dot b" style="left:${X(b.fpr)}" title="Baseline ${pct(b.fpr)} (${pct(b.lo)} to ${pct(b.hi)})"></span>
+        <span class="whisk" style="left:${X(f.lo)};width:calc(${X(f.hi)} - ${X(f.lo)})"></span><span class="dot" style="left:${X(f.fpr)}" title="Final ${pct(f.fpr)} (${pct(f.lo)} to ${pct(f.hi)})"></span></div>
+      <div class="num">${pct(f.fpr)} <span class="${d.significant ? 'sig' : ''}">${d.significant ? 'real change' : 'within noise'}</span></div>`;
+  }).join('');
+  const IP = E.inprocessing;
+  const ipRows = IP.map(r => `<tr><td>${esc(r.model)}</td><td>${r.F1.toFixed(3)}</td><td>${r['Mean BPSN AUC'].toFixed(3)}</td><td>${pct(r['Jewish FPR'])}</td><td>${pct(r['Jewish FNR'])}</td></tr>`).join('');
+  const A = E.annotators.final, j = imp.jewish;
+  $('#auditbody').insertAdjacentHTML('beforeend', `
+    <h2>How sure are these numbers?</h2>
+    <p class="lede">Each line is a 95% range from resampling the test set 1,000 times; grey is the baseline, teal the final model. Small groups have wide ranges. The Jewish-group drop of ${Math.round(j.diff*100)} points is a real change (range ${Math.round(j.lo*100)} to ${Math.round(j.hi*100)} points); no other group changed beyond the noise.</p>
+    <div class="ci">${rows}</div>
+    <p class="hint" style="margin-top:12px">Dashed line: posts that name no group (${pct(bgf.fpr)}, range ${pct(bgf.lo)} to ${pct(bgf.hi)}).</p>
+
+    <h2>Training with a fairness constraint</h2>
+    <p class="lede">In-processing: Fairlearn's ExponentiatedGradient trains the classifier under a fairness constraint. It keeps full accuracy and misses less hate, but removes far fewer wrong flags than our thresholds, because an over-fitted model already looks fair on the training data it is constrained on.</p>
+    <div style="overflow-x:auto"><table class="grid"><thead><tr><th>Model</th><th>F1</th><th>BPSN AUC</th><th>Jewish FPR</th><th>Jewish FNR</th></tr></thead><tbody>${ipRows}</tbody></table></div>
+
+    <h2>When the annotators disagree</h2>
+    <p class="lede">Each post was labelled by three people. On ${pct(A.share_split_all)} of test posts they split on toxic versus harmless, and that is where the model struggles most.</p>
+    <div class="pair">
+      <div><b>${pct(A.error_rate_unanimous)}</b><span>error rate when all three agreed</span></div>
+      <div><b>${pct(A.error_rate_split)}</b><span>error rate when they split</span></div>
+      <div><b>${pct(A.split_share_false_positives)}</b><span>of wrong flags are contested posts (vs ${pct(A.split_share_harmless)} of harmless posts)</span></div>
+    </div>
+    <p class="hint" style="margin-top:28px">Every per-group rate here was recomputed with Fairlearn's MetricFrame; the largest difference from our own code is ${E.metricframe.max_abs_diff.toFixed(4)}.</p>`);
+}
+function fprChart(){
+  const src = {baseline: M.baseline.bias_report, cda: M.counterfactual_th_bias_report, final: M.final.bias_report}[view];
+  const bg = src.overall.fpr_background, max = .7;
+  $('#fprchart').innerHTML = Object.entries(src.groups).map(([g, v]) =>
+    `<div>${GL[g]}</div><div class="bar"><b class="${v.fpr > bg + .1 ? 'hot' : ''}" style="width:${v.fpr/max*100}%"></b><span class="bg" style="left:${bg/max*100}%"></span></div><div class="num">${pct(v.fpr)}</div>`).join('');
+  const o = src.overall;
+  $('#fprnote').textContent = `Background rate (posts naming no group): ${pct(bg)}. Largest gap to it: ${Math.round(o.max_fpr_gap*100)} points. BPSN AUC (higher means fewer identity-driven false flags): ${o.pm_bpsn_auc.toFixed(3)}.`;
+}
+function drawAudit(){
+  const fb = M.baseline.bias_report.groups.jewish.fpr, ff = M.final.bias_report.groups.jewish.fpr;
+  const ev = {...M.evasion, 'Final model': M.final.evasion};
+  const AT = [['leetspeak','Leetspeak'],['homoglyph','Look-alike letters'],['zero_width','Invisible characters'],['spacing','Spaced letters'],['benign_pad','Friendly padding'],['greedy_2','Adaptive, 2 words'],['greedy','Adaptive, 30%']];
+  const cell = x => `<td style="background:rgba(155,58,51,${(x*.55).toFixed(2)});color:${x>.6?'#fff':'inherit'}">${pct(x)}</td>`;
+  const mr = M.poisoning.mass_report, bd = M.poisoning.backdoor;
+  const mini = (vals, labels) => `<div class="mini">${vals.map((v, i) =>
+      `<div><em>${pct(v)}</em><b style="height:0;background:${['#9aa0a6','var(--remove)','var(--allow)'][i]}" data-h="${Math.max(v*100,1)}"></b></div>`).join('')}</div>
+      <div class="minil">${labels.map(l => `<div>${l}</div>`).join('')}</div>`;
+  const X = M.explainability.final, b = M.final.bands;
+  $('#auditbody').innerHTML = `
+    <h2>Who gets wrongly flagged</h2>
+    <p class="lede">Share of harmless posts flagged, split by the group they mention. The dashed line is the rate for posts that mention no group. The baseline flagged ${pct(fb)} of harmless posts mentioning Jewish identity. The final model brings that to ${pct(ff)}, without making other groups meaningfully worse.</p>
+    <div class="seg" role="group" aria-label="Model">
+      <button aria-pressed="true" data-v="baseline">Baseline</button>
+      <button aria-pressed="false" data-v="cda">Counterfactual + thresholds</button>
+      <button aria-pressed="false" data-v="final">Final model</button></div>
+    <div class="fpr" id="fprchart"></div><p class="hint" id="fprnote" style="margin-top:12px"></p>
+
+    <h2>How often disguises get through</h2>
+    <p class="lede">Share of caught toxic posts that slip past after each attack. Cleaning up spelling stops the obfuscation tricks outright. The adaptive attacker still wins often, which is why uncertain posts go to a person.</p>
+    <div style="overflow-x:auto"><table class="grid"><thead><tr><th>Attack</th>${Object.keys(ev).map(k => `<th>${k}</th>`).join('')}</tr></thead>
+    <tbody>${AT.map(([k, l]) => `<tr><td>${l}</td>${Object.values(ev).map(v => cell(v[k])).join('')}</tr>`).join('')}</tbody></table></div>
+
+    <h2>Poisoned training data</h2>
+    <p class="lede">Two attacks on the labels the model learns from, each caught by a targeted check.</p>
+    <div class="trio">
+      <div><h3>Mass reporting against Muslim posts</h3>${mini([mr.muslim_fpr_clean, mr.muslim_fpr_poisoned, mr.muslim_fpr_after_defence], ['Clean','Poisoned','Defended'])}
+        <p class="hint">Harmless Muslim-mentioning posts wrongly flagged. Caught by a per-group label-drift check (+${Math.round(mr.label_drift.muslim.shift*100)} points for the targeted group) and an audit that hides identity words.</p></div>
+      <div><h3>Hidden backdoor word</h3>${mini([bd.trigger_evasion_clean, bd.trigger_evasion_poisoned, bd.trigger_evasion_after_defence], ['Clean','Poisoned','Defended'])}
+        <p class="hint">Toxic posts that slip through when the trigger word is added. A trigger scan found the planted word and removed all ${bd.poisoned_posts_removed} poisoned posts.</p></div>
+    </div>
+
+    <h2>Do the explanations match people?</h2>
+    <p class="lede">On ${X.n_posts} toxic posts, we compared the highlighted words with the words human annotators marked as the reason.</p>
+    <div class="fpr">${[['occlusion','Occlusion'],['lime','LIME'],['random','Random words']].map(([k, l]) =>
+      `<div>${l}</div><div class="bar"><b style="width:${X[k].token_f1*100}%;background:${k==='random'?'#9aa0a6':'var(--allow)'}"></b></div><div class="num">${X[k].token_f1.toFixed(2)}</div>`).join('')}</div>
+    <p class="hint" style="margin-top:12px">Agreement (token F1) with human rationales. Removing the top-highlighted fifth of words drops the score by ${X.occlusion.comprehensiveness.toFixed(2)} on average, so the highlights reflect what the model actually uses.</p>
+
+    <h2>Where posts end up</h2>
+    <p class="lede">Of all test posts, ${pct(b.remove.share)} are removed automatically (${pct(b.remove.toxic_rate)} of them truly toxic) and ${pct(b['human review'].share)} go to a person, where the model is least sure (${pct(b['human review'].toxic_rate)} toxic).</p>
+    <div class="stack"><div style="width:${b.allow.share*100}%;background:var(--allow)">Allow ${pct(b.allow.share)}</div><div style="width:${b['human review'].share*100}%;background:var(--review)">Review ${pct(b['human review'].share)}</div><div style="width:${b.remove.share*100}%;background:var(--remove)">Remove ${pct(b.remove.share)}</div></div>`;
+  document.querySelectorAll('.audit .seg button').forEach(bn => bn.onclick = () => {
+    document.querySelectorAll('.audit .seg button').forEach(x => x.setAttribute('aria-pressed', x === bn));
+    view = bn.dataset.v; fprChart();
+  });
+  fprChart();
+  requestAnimationFrame(() => document.querySelectorAll('.mini b').forEach(x => x.style.height = x.dataset.h + '%'));
+}
+
+$('#post').value = EXAMPLES[0][1]; check();
+</script>
+</body>
+</html>
